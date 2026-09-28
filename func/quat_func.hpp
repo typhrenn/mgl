@@ -3,6 +3,7 @@
 #include <cmath>
 #include "../core/quat.hpp"
 #include "../core/types.hpp"
+#include "../core/vec.hpp"
 #include "vec_func.hpp"
 #include "../gtc/constants.hpp"
 
@@ -28,13 +29,13 @@ namespace mgl {
 
     // quaternion dot product
     template <typename T>
-    constexpr inline T dot(const quat<T> a, const quat<T> b) noexcept {
+    constexpr inline T dot(const quat<T> &a, const quat<T> &b) noexcept {
         return (a.x * b.x) + (a.y * b.y) + (a.z * b.z) + (a.w * b.w);
     }
 
     // quaternion normalization
     template <typename T>
-    inline quat<T> normalize(const quat<T> q) noexcept {
+    inline quat<T> normalize(const quat<T> &q) noexcept {
         T norm = (q.x * q.x) + (q.y * q.y) + (q.z * q.z) + (q.w * q.w);
 
         // fallback
@@ -52,7 +53,7 @@ namespace mgl {
 
     // quaternion conjugation
     template <typename T>
-    constexpr inline quat<T> conjugate(const quat<T> q) noexcept {
+    constexpr inline quat<T> conjugate(const quat<T> &q) noexcept {
         return quat<T>{
             -q.x,
             -q.y,
@@ -63,7 +64,7 @@ namespace mgl {
 
     // quaternion inverse
     template <typename T>
-    constexpr inline quat<T> inverse(const quat<T> q) noexcept {
+    constexpr inline quat<T> inverse(const quat<T> &q) noexcept {
         T norm = (q.x * q.x) + (q.y * q.y) + (q.z * q.z) + (q.w * q.w);
 
         if (norm == static_cast<T>(0)) return identity_quat<T>;
@@ -81,7 +82,7 @@ namespace mgl {
 
     // quaternion spherical interpolation
     template <typename T>
-    inline quat<T> slerp(const quat<T> a, const quat<T> b, T t) noexcept {
+    inline quat<T> slerp(const quat<T> &a, const quat<T> &b, T t) noexcept {
         T cos_theta = dot(a, b);
         quat<T> dest = b;
 
@@ -112,6 +113,23 @@ namespace mgl {
             (w1 * a.y) + (w2 * dest.y),
             (w1 * a.z) + (w2 * dest.z),
             (w1 * a.w) + (w2 * dest.w)
+        };
+    }
+
+	template <typename T>
+	constexpr inline vec3 rotate(const quat<T> &q, const vec3 &v) noexcept {
+		vec3 qv = vec3{q.x, q.y, q.z};
+		vec3 t = cross(qv, v) * 2;
+
+		return v + (t * q.w) + cross(qv, t);
+	}
+
+	template <typename T>
+    inline vec3 quat_to_euler(const quat<T> &q) noexcept {
+        return vec3{
+            atan2(2 * (q.w * q.x + q.y * q.z), 1 - 2 * (q.x * q.x + q.y * q.y)),
+            asin(clamp(2 * (q.w * q.y - q.z * q.x), static_cast<T>(-1), static_cast<T>(1))),
+            atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z))
         };
     }
 }

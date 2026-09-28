@@ -122,6 +122,13 @@ namespace mgl {
 		return res;
 	}
 
+	template <typename T>
+    constexpr inline T clamp(const T v, const T low, const T high) noexcept {
+        if (v < low)  return low;
+        if (v > high) return high;
+        return v;
+    }
+
 	template <int L, typename T = float>
 	constexpr inline vec<L, T> abs(const vec<L, T> &v) {
 		vec<L, T> res;
@@ -130,5 +137,10 @@ namespace mgl {
 		}
 
 		return res;
+	}
+
+	template <int L, typename T = float>
+	constexpr inline vec<L, T> nlerp(const vec<L, T> &a, const vec<L, T> &b, T f) noexcept {
+		return normalize(lerp(a, b, t));
 	}
 }
