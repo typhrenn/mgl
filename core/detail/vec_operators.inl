@@ -65,8 +65,11 @@ namespace mgl {
     template <int L, typename T>
     constexpr inline vec<L, T> operator/(vec<L, T> v, T scalar) noexcept {
         vec<L, T> result;
+
+		T inv_scalar = 1.0f / scalar;
+
         for (int i = 0; i < L; ++i) {
-            result[i] = v[i] / scalar;
+            result[i] = v[i] * inv_scalar;
         }
         return result;
     }
