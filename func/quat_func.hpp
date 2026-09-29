@@ -2,26 +2,24 @@
 
 #include <cmath>
 #include "../core/quat.hpp"
-#include "../core/types.hpp"
-#include "../core/vec.hpp"
 #include "vec_func.hpp"
 #include "../gtc/constants.hpp"
 
 namespace mgl {
     template <typename T>
-    inline quat<T> single_axis_quat(const vec<3, T> &axis, radian<T> rad) noexcept {
-        vec<3, T> norm_axis = normalize(axis);
+    inline Quat<T> Quat<T>::single_axis_quat(const vec<3, T> &axis, radian<T> rad) noexcept {
+        vec<3, T> norm_axis = mgl::normalize(axis);
 
         T half_angle = static_cast<T>(rad) * static_cast<T>(0.5);
         T c = std::cos(half_angle);
         T s = std::sin(half_angle);
 
-        return quat<T>{s * norm_axis.x, s * norm_axis.y, s * norm_axis.z, c};
+        return Quat<T>{s * norm_axis.x, s * norm_axis.y, s * norm_axis.z, c};
     }
 
     // quaternion from 3 axes
     template <typename T>
-    inline quat<T> full_axis_quat(const vec<3, T> &rot) noexcept {
+    inline Quat<T> Quat<T>::full_axis_quat(const vec<3, T> &rot) noexcept {
         return single_axis_quat(x_axis(), rot.x)
              * single_axis_quat(y_axis(), rot.y)
              * single_axis_quat(z_axis(), rot.z);
@@ -29,75 +27,78 @@ namespace mgl {
 
     // quaternion dot product
     template <typename T>
-    constexpr inline T dot(const quat<T> &a, const quat<T> &b) noexcept {
-        return (a.x * b.x) + (a.y * b.y) + (a.z * b.z) + (a.w * b.w);
+    constexpr inline T Quat<T>::dot(const Quat<T> &b) const noexcept {
+        return (x * b.x) + (y * b.y) + (z * b.z) + (w * b.w);
     }
 
     // quaternion normalization
     template <typename T>
-    inline quat<T> normalize(const quat<T> &q) noexcept {
-        T norm = (q.x * q.x) + (q.y * q.y) + (q.z * q.z) + (q.w * q.w);
+    inline Quat<T>& Quat<T>::normalize() noexcept {
+        T norm = (x * x) + (y * y) + (z * z) + (w * w);
 
-        // fallback
-        if (norm == static_cast<T>(0)) return identity_quat;
+        if (norm == static_cast<T>(0)) {
+            *this = identity_quat;
+            return *this;
+        }
 
         T inv_norm = static_cast<T>(1) / std::sqrt(norm);
 
-        return quat<T>{
-            q.x * inv_norm,
-            q.y * inv_norm,
-            q.z * inv_norm,
-            q.w * inv_norm
-        };
+        x *= inv_norm;
+        y *= inv_norm;
+        z *= inv_norm;
+        w *= inv_norm;
+        
+        return *this;
     }
 
     // quaternion conjugation
     template <typename T>
-    constexpr inline quat<T> conjugate(const quat<T> &q) noexcept {
-        return quat<T>{
-            -q.x,
-            -q.y,
-            -q.z,
-            q.w
-        };
+    constexpr inline Quat<T>& Quat<T>::conjugate() noexcept {
+        x = -x;
+        y = -y;
+        z = -z;
+        return *this;
     }
 
     // quaternion inverse
     template <typename T>
-    constexpr inline quat<T> inverse(const quat<T> &q) noexcept {
-        T norm = (q.x * q.x) + (q.y * q.y) + (q.z * q.z) + (q.w * q.w);
+    constexpr inline Quat<T>& Quat<T>::inverse() noexcept {
+        T norm = (x * x) + (y * y) + (z * z) + (w * w);
 
-        if (norm == static_cast<T>(0)) return identity_quat;
+        if (norm == static_cast<T>(0)) {
+            *this = identity_quat;
+            return *this;
+        }
 
         T inv_norm = static_cast<T>(1.0f) / norm;
-        quat<T> cq = conjugate(q);
+        
+        conjugate();
+        
+        x *= inv_norm;
+        y *= inv_norm;
+        z *= inv_norm;
+        w *= inv_norm;
 
-        return quat<T>{
-            cq.x * inv_norm,
-            cq.y * inv_norm,
-            cq.z * inv_norm,
-            cq.w * inv_norm
-        };
+        return *this;
     }
 
     // quaternion spherical interpolation
     template <typename T>
-    inline quat<T> slerp(const quat<T> &a, const quat<T> &b, T t) noexcept {
-        T cos_theta = dot(a, b);
-        quat<T> dest = b;
+    inline Quat<T>& Quat<T>::slerp(const Quat<T> &b, T t) noexcept {
+        T cos_theta = dot(b);
+        Quat<T> dest = b;
 
         if (cos_theta < static_cast<T>(0)) {
             cos_theta = -cos_theta;
-            dest = quat<T>{-b.x, -b.y, -b.z, -b.w};
+            dest = Quat<T>{-b.x, -b.y, -b.z, -b.w};
         }
 
         if (cos_theta > static_cast<T>(1) - epsilon<T>()) {
-            return normalize(quat<T>{
-                a.x + t * (dest.x - a.x),
-                a.y + t * (dest.y - a.y),
-                a.z + t * (dest.z - a.z),
-                a.w + t * (dest.w - a.w),
-            });
+            x += t * (dest.x - x);
+            y += t * (dest.y - y);
+            z += t * (dest.z - z);
+            w += t * (dest.w - w);
+            return normalize();
         }
 
         T theta = std::acos(cos_theta);
@@ -108,28 +109,28 @@ namespace mgl {
         T w1 = std::sin((static_cast<T>(1) - t) * theta) * inv_sin;
         T w2 = std::sin(t * theta) * inv_sin;
 
-        return quat<T>{
-            (w1 * a.x) + (w2 * dest.x),
-            (w1 * a.y) + (w2 * dest.y),
-            (w1 * a.z) + (w2 * dest.z),
-            (w1 * a.w) + (w2 * dest.w)
-        };
+        x = (w1 * x) + (w2 * dest.x);
+        y = (w1 * y) + (w2 * dest.y);
+        z = (w1 * z) + (w2 * dest.z);
+        w = (w1 * w) + (w2 * dest.w);
+
+        return *this;
     }
 
 	template <typename T>
-	constexpr inline vec3 rotate(const quat<T> &q, const vec3 &v) noexcept {
-		vec3 qv = vec3{q.x, q.y, q.z};
+	constexpr inline vec3 Quat<T>::rotate(const vec3 &v) const noexcept {
+		vec3 qv = vec3{x, y, z};
 		vec3 t = cross(qv, v) * 2.0f;
 
-		return v + (t * q.w) + cross(qv, t);
+		return v + (t * w) + cross(qv, t);
 	}
 
 	template <typename T>
-    inline vec<3, radian<>> quat_to_euler(const quat<T> &q) noexcept {
+    inline vec<3, radian<>> Quat<T>::quat_to_euler() const noexcept {
         return vec<3, radian<>>{ 
-            atan2(2.0f * (q.w * q.x + q.y * q.z), 1.0f - 2.0f * (q.x * q.x + q.y * q.y)),
-            asin(clamp(2 * (q.w * q.y - q.z * q.x), static_cast<T>(-1), static_cast<T>(1))),
-            atan2(2.0f * (q.w * q.z + q.x * q.y), 1.0f - 2.0f * (q.y * q.y + q.z * q.z))
+            atan2(2.0f * (w * x + y * z), 1.0f - 2.0f * (x * x + y * y)),
+            asin(clamp(2 * (w * y - z * x), static_cast<T>(-1), static_cast<T>(1))),
+            atan2(2.0f * (w * z + x * y), 1.0f - 2.0f * (y * y + z * z))
         };
     }
 }
