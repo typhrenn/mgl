@@ -1,4 +1,4 @@
-#include "mgl.hpp" // Assuming this includes your headers
+#include "mgl.hpp"
 #include <vector>
 #include <iostream>
 
@@ -40,7 +40,7 @@ int main() {
     c.v.push_back({ 1.0f, -1.0f,  1.0f});
     c.v.push_back({ 1.0f,  1.0f,  1.0f});
 
-    mgl::vec3 rotation_radians = {3.14159f, 0.87266f, 0.87266f}; 
+    mgl::vec3 rotation_radians = {mgl::radians(180.0f), mgl::radians(45.0f), mgl::radians(100.0f)}; 
 
     Cube c_quat = rot_cube_quat(c, rotation_radians);
 
