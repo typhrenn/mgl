@@ -22,9 +22,9 @@ namespace mgl {
     // quaternion from 3 axes
     template <typename T>
     inline quat<T> full_axis_quat(const vec<3, T> &rot) noexcept {
-        return single_axis_quat(x_axis<T>(), rot.x)
-             * single_axis_quat(y_axis<T>(), rot.y)
-             * single_axis_quat(z_axis<T>(), rot.z);
+        return single_axis_quat(x_axis(), rot.x)
+             * single_axis_quat(y_axis(), rot.y)
+             * single_axis_quat(z_axis(), rot.z);
     }
 
     // quaternion dot product
@@ -39,7 +39,7 @@ namespace mgl {
         T norm = (q.x * q.x) + (q.y * q.y) + (q.z * q.z) + (q.w * q.w);
 
         // fallback
-        if (norm == static_cast<T>(0)) return identity_quat<T>;
+        if (norm == static_cast<T>(0)) return identity_quat;
 
         T inv_norm = static_cast<T>(1) / std::sqrt(norm);
 
@@ -67,9 +67,9 @@ namespace mgl {
     constexpr inline quat<T> inverse(const quat<T> &q) noexcept {
         T norm = (q.x * q.x) + (q.y * q.y) + (q.z * q.z) + (q.w * q.w);
 
-        if (norm == static_cast<T>(0)) return identity_quat<T>;
+        if (norm == static_cast<T>(0)) return identity_quat;
 
-        T inv_norm = static_cast<T>(1) / norm;
+        T inv_norm = static_cast<T>(1.0f) / norm;
         quat<T> cq = conjugate(q);
 
         return quat<T>{
@@ -119,17 +119,17 @@ namespace mgl {
 	template <typename T>
 	constexpr inline vec3 rotate(const quat<T> &q, const vec3 &v) noexcept {
 		vec3 qv = vec3{q.x, q.y, q.z};
-		vec3 t = cross(qv, v) * 2;
+		vec3 t = cross(qv, v) * 2.0f;
 
 		return v + (t * q.w) + cross(qv, t);
 	}
 
 	template <typename T>
-    inline vec3 quat_to_euler(const quat<T> &q) noexcept {
-        return vec3{
-            atan2(2 * (q.w * q.x + q.y * q.z), 1 - 2 * (q.x * q.x + q.y * q.y)),
+    inline vec<3, radian<>> quat_to_euler(const quat<T> &q) noexcept {
+        return vec<3, radian<>>{ 
+            atan2(2.0f * (q.w * q.x + q.y * q.z), 1.0f - 2.0f * (q.x * q.x + q.y * q.y)),
             asin(clamp(2 * (q.w * q.y - q.z * q.x), static_cast<T>(-1), static_cast<T>(1))),
-            atan2(2 * (q.w * q.z + q.x * q.y), 1 - 2 * (q.y * q.y + q.z * q.z))
+            atan2(2.0f * (q.w * q.z + q.x * q.y), 1.0f - 2.0f * (q.y * q.y + q.z * q.z))
         };
     }
 }

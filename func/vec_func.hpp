@@ -133,14 +133,14 @@ namespace mgl {
 	constexpr inline vec<L, T> abs(const vec<L, T> &v) {
 		vec<L, T> res;
 		for (int i = 0; i < L; i++) {
-			res[i] = std::abs(v[i])
+			res[i] = std::abs(v[i]);
 		}
 
 		return res;
 	}
 
 	template <int L, typename T = float>
-	constexpr inline vec<L, T> nlerp(const vec<L, T> &a, const vec<L, T> &b, T f) noexcept {
+	constexpr inline vec<L, T> nlerp(const vec<L, T> &a, const vec<L, T> &b, T t) noexcept {
 		return normalize(lerp(a, b, t));
 	}
 }
