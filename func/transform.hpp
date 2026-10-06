@@ -3,7 +3,6 @@
 #include "../core/mat.hpp"
 #include "../core/vec.hpp"
 #include "quat_func.hpp"
-#include "../debug/print.hpp"
 
 namespace mgl {
     // creates a 4x4 transformation matrix

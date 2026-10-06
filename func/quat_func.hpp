@@ -5,7 +5,7 @@
 #include "../core/types.hpp"
 #include "../core/vec.hpp"
 #include "vec_func.hpp"
-#include "../gtc/constants.hpp"
+#include "../constants/constants.hpp"
 
 namespace mgl {
     template <typename T>

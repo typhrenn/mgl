@@ -4,7 +4,7 @@
 #include "core/vec.hpp"
 #include "core/mat.hpp"
 #include "core/quat.hpp"
-#include "gtc/constants.hpp"
+#include "constants/constants.hpp"
 #include "core/types.hpp"
 
 
@@ -15,5 +15,4 @@
 #include "func/quat_func.hpp"
 #include "func/transform.hpp"
 
-// debug helpers
-#include "debug/print.hpp"
+#include "random/random.hpp"
