@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <ostream>
 #include "mat.hpp"
 
 namespace mgl {
@@ -15,6 +16,11 @@ namespace mgl {
 
 		constexpr quat() noexcept : x(0), y(0), z(0), w(1) {}
 		constexpr quat(T _x, T _y, T _z, T _w) noexcept : x(_x), y(_y), z(_z), w(_w) {}
+
+		friend std::ostream& operator<<(std::ostream& os, const quat<T>& q) {
+			os << "{x='" << q.x << "',y='" << q.y << "',z='" << q.z << "',w='" << q.w << "'}";
+			return os;
+		}
 
 		constexpr T& operator[](int index) noexcept { return data[index]; }
 		constexpr const T& operator[](int index) const noexcept { return data[index]; }

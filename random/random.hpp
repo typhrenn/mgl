@@ -28,7 +28,7 @@ namespace Random {
 		return dist(detail::engine());
 	}
 
-	template <int L, typename T>
+	template <int L, typename T = float>
 	inline mgl::vec<L, T> Vector(T min, T max) {
 		mgl::vec<L, T> v;
 		std::uniform_real_distribution<T> dist(min, max);
@@ -40,7 +40,7 @@ namespace Random {
 		return v;
 	}
 
-	template <typename T>
+	template <typename T = float>
 	inline mgl::quat<T> Quaternion() {
 		std::uniform_real_distribution<T> dist(0.0, 1.0);
 		

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <ostream>
 
 namespace mgl {
 
@@ -17,6 +18,11 @@ namespace mgl {
 
         constexpr T& operator[](int index) noexcept {return data[index];}
         constexpr const T& operator[](int index) const noexcept {return data[index];}
+
+		friend std::ostream& operator<<(std::ostream& os, const vec<2, T> v) {
+			os << "{x='" << v.x << "',y='" << v.y << "'}";
+			return os;
+		}
     };
 
     template <typename T> struct vec<3, T> {
@@ -30,6 +36,11 @@ namespace mgl {
 
         constexpr T& operator[](int index) noexcept {return data[index];}
         constexpr const T& operator[](int index) const noexcept {return data[index];}
+
+		friend std::ostream& operator<<(std::ostream& os, const vec<3, T> v) {
+			os << "{x='" << v.x << "',y='" << v.y << "',z='" << v.z << "'}";
+			return os;
+		}
     };
 
     template <typename T> struct alignas(4 * sizeof(T)) vec<4, T> {
@@ -43,6 +54,11 @@ namespace mgl {
 
         constexpr T& operator[](int index) noexcept {return data[index];}
         constexpr const T& operator[](int index) const noexcept {return data[index];}
+
+		friend std::ostream& operator<<(std::ostream& os, const vec<4, T> v) {
+			os << "{x='" << v.x << "',y='" << v.y << "',z='" << v.z << "',w='" << v.w << "'}";
+			return os;
+		}
     };
 
     // type definitions

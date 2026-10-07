@@ -8,7 +8,8 @@
 #include "../constants/constants.hpp"
 
 namespace mgl {
-    template <typename T>
+	// from radians
+    template <typename T = float>
     inline quat<T> single_axis_quat(const vec<3, T> &axis, radian<T> rad) noexcept {
         vec<3, T> norm_axis = normalize(axis);
 
@@ -20,7 +21,7 @@ namespace mgl {
     }
 
     // quaternion from 3 axes
-    template <typename T>
+    template <typename T = float>
     inline quat<T> full_axis_quat(const vec<3, T> &rot) noexcept {
         return single_axis_quat(x_axis(), rot.x)
              * single_axis_quat(y_axis(), rot.y)

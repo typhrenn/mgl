@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <ostream>
 #include "vec.hpp"
 
 namespace mgl {
@@ -19,6 +20,18 @@ namespace mgl {
         constexpr const vec<R, T>& operator[](int index) const noexcept {return columns[index];}
 
         constexpr const T* data() const noexcept {return &columns[0][0];}
+
+		friend std::ostream& operator<<(std::ostream& os, const mat<C, R, T>& m) {
+			os << "{";
+			for (int i = 0; i < C; i++) {
+				os << "C" << i << ":";
+				for (int j = 0; j < R; j++) {
+					os << "'" << m[i][j] << "'" << ",";
+				}
+			}
+			os << "}";
+			return os;
+		}
     };
 
     // type definitions
